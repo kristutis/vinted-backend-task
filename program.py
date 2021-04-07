@@ -51,9 +51,9 @@ def get_input_data(prices_file, input_file):
     
     transactions = []
     with open(input_file) as lines:
-        for line in lines:
-            fields = line.rstrip().split(" ")
+        for line in lines:            
             try:
+                fields = line.rstrip().split(" ")
                 transaction = Transaction(True, fields[0], fields[1], fields[2], float(0), float(0))
                 transactions.append(transaction)
             except:

@@ -31,8 +31,8 @@ class Transaction:
             if self.shipment_discount == 0:
                 discount = "-"
             else:
-                discount = str(self.shipment_discount)
-            return self.date + " " + self.size + " " + self.carrier + " " + str(self.shipment_price) + " " + discount
+                discount = "{0:.2f}".format(round(self.shipment_discount, 2))
+            return "{0} {1} {2} {3:.2f} {4}".format(self.date, self.size, self.carrier, round(self.shipment_price, 2), discount)
         else:
             return self.date + " Ignored"
     
@@ -134,12 +134,13 @@ def calculate_transactions(prices, transactions):
         if not calculated:
             i.shipment_price = get_provider_shipment_price(prices, i.carrier, i.size)
 
-    for i in transactions:
-        print(i)
+    return transactions
 
 def main():
     prices, transactions = get_input_data(PRICES_FILE, INPUT_FILE)
-    calculate_transactions(prices, transactions)
+    transactions = calculate_transactions(prices, transactions)
+    for i in transactions:
+        print(i)
 
 if __name__ == "__main__":
     main()

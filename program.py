@@ -1,4 +1,6 @@
 #vinted backend task
+
+# constants
 INPUT_FILE = "input.txt"
 PRICES_FILE = "prices.txt"
 MAX_DISCOUNT = 10
@@ -18,7 +20,7 @@ class Price:
         return self.provider + " " + self.package_size + " " + str(self.price)
 
 class Transaction:
-    def __init__(self, valid, date, size, carrier, shipment_price, shipment_discount):
+    def __init__(self, valid, date, size, carrier):
         self.valid = valid
         self.date = date
         self.size = size
@@ -37,8 +39,11 @@ class Transaction:
             return self.date + " Ignored"
     
     def get_yyyy_mm(self):
-        fields = self.date.split("-")
-        return fields[0] + "-" + fields[1]
+        if self.valid:
+            fields = self.date.split("-")
+            return fields[0] + "-" + fields[1]
+        else:
+            return "Invalid data"
 
 
 def get_input_data(prices_file, input_file):
@@ -54,10 +59,10 @@ def get_input_data(prices_file, input_file):
         for line in lines:            
             try:
                 fields = line.rstrip().split(" ")
-                transaction = Transaction(True, fields[0], fields[1], fields[2], float(0), float(0))
+                transaction = Transaction(True, fields[0], fields[1], fields[2])
                 transactions.append(transaction)
             except:
-                transaction = Transaction(False, line.rstrip(), "", "", float(0), float(0))
+                transaction = Transaction(False, line.rstrip(), "", "")
                 transactions.append(transaction) 
 
     return prices, transactions

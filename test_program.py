@@ -15,6 +15,19 @@ price3 = Price("CCC", "Y", 4.8)
 price4 = Price("MR", "S", 2)
 prices = [price1, price2, price3, price4]
 
+class TestPrices(unittest.TestCase):
+    # checking returning values from the methods
+    def test_lowest_price(self):        
+        self.assertAlmostEqual(get_lowest_price(prices, "X"), 1.5)
+
+    def test_shipment_price(self):
+        self.assertAlmostEqual(get_provider_shipment_price(prices, "BBB", "X"), 10.9)
+
+class TestExceptions(unittest.TestCase):
+    # checking if a program raises an error if a wrong input file was given
+    def test_wrong_input_file(self):
+        self.assertRaises(FileNotFoundError, get_input_data, "prices.txt", "wrongfile.txt")
+
 transaction = Transaction(True, "2015-02-06", "S", "MR")
 transaction1 = Transaction(True, "2015-02-05", "L", "LP")
 transaction2 = Transaction(True, "2015-02-07", "L", "LP")
@@ -24,14 +37,7 @@ transaction5 = Transaction(True, "2015-03-24", "L", "LP")
 transaction6 = Transaction(True, "2015-03-24", "L", "LP")
 transactions = [transaction1, transaction2, transaction3, transaction4, transaction5, transaction6]
 
-class TestLowestPrice(unittest.TestCase):
-    # checking returning values from the methods
-    def test_lowest_price(self):        
-        self.assertAlmostEqual(get_lowest_price(prices, "X"), 1.5)
-
-    def test_shipment_price(self):
-        self.assertAlmostEqual(get_provider_shipment_price(prices, "BBB", "X"), 10.9)
-
+class TestRules(unittest.TestCase):
     def test_discount_rules1(self):        
         shipment_price, discount, total_discount = apply_rule1(transaction, prices, 1.5, 9.90)
         self.assertAlmostEqual(shipment_price, 1.90)
@@ -59,7 +65,3 @@ class TestLowestPrice(unittest.TestCase):
         shipment_price, discount, counter, iterator, applied_discount[transactions[5].get_yyyy_mm()] = apply_rule2(transactions[5], 4.40, counter, iterator, applied_discount[transactions[5].get_yyyy_mm()])
         self.assertEqual(shipment_price, 0)
         self.assertEqual(discount, 4.40)
-
-    # checking if a program raises an error if a wrong input file was given
-    def test_wrong_input_file(self):
-        self.assertRaises(FileNotFoundError, get_input_data, "prices.txt", "wrongfile.txt")

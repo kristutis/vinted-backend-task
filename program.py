@@ -102,7 +102,7 @@ def apply_rule1(transaction, prices, lowest_price, applied_discount):
 # method to calculate discount and price to be paid by a memeber, if package is size of L
 def apply_rule2(transaction, price, free_shipments_counter, free_shipments_iterator, applied_discount):
     month = transaction.get_yyyy_mm()
-    
+
     if free_shipments_counter[month] > 0:
         if free_shipments_iterator[month] == 1:
             free_shipments_iterator[month] = 3
@@ -119,15 +119,15 @@ def apply_rule2(transaction, price, free_shipments_counter, free_shipments_itera
         return price, 0, free_shipments_counter, free_shipments_iterator, applied_discount
 
 # method to get key-value pairs that will be used count the amount of L size packages sent in a month
-def format_months_dict(transactions):    
+def format_months_dict(transactions, free_shipments_in_month, free_shipment_iterative):    
     counter = dict()
     iterator = dict()
     applied_discount = dict()
     for i in transactions:
         month = i.get_yyyy_mm()
         if not month in counter:
-            counter[month] = FREE_SHIPMENTS_IN_MONTH
-            iterator[month] = FREE_SHIPMENT_ITERATIVE
+            counter[month] = free_shipments_in_month
+            iterator[month] = free_shipment_iterative
             applied_discount[month] = float(0)
     return counter, iterator, applied_discount
 
@@ -139,7 +139,7 @@ def get_provider_shipment_price(prices, provider, size):
 
 # method to find how much a member has to pay and to find the discount for the shipment
 def calculate_transactions(prices, transactions):    
-    free_shipments_counter, free_shipments_iterator, applied_discount = format_months_dict(transactions)
+    free_shipments_counter, free_shipments_iterator, applied_discount = format_months_dict(transactions, FREE_SHIPMENTS_IN_MONTH, FREE_SHIPMENT_ITERATIVE)
     lowest_price = get_lowest_price(prices, LOWEST_PRICE_SIZE)
 
     for i in transactions:

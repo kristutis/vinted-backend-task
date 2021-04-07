@@ -1,15 +1,19 @@
 #vinted backend task
 
 # constants
-INPUT_FILE = "input.txt"
-PRICES_FILE = "prices.txt"
-MAX_DISCOUNT = 10
-LOWEST_PRICE_SIZE = "S"
-FREE_SHIPMENT_SIZE = "L"
-FREE_SHIPMENT_PROVIDER = "LP"
-FREE_SHIPMENTS_IN_MONTH = 1
-FREE_SHIPMENT_ITERATIVE = 3
+INPUT_FILE = "input.txt"            # member's transactions data
+PRICES_FILE = "prices.txt"          # data with a list of providers, sizes and prices for shipment
+MAX_DISCOUNT = 10                   # maximum discount available for a month
+LOWEST_PRICE_SIZE = "S"             # size of a package, that the cost above the lowest of all providers will be covered
+FREE_SHIPMENT_SIZE = "L"            # size of a package. Every third package of this size will sent for free (once in a month)
+FREE_SHIPMENT_PROVIDER = "LP"       # provider of which every third L size package shipment cost will covered
+FREE_SHIPMENTS_IN_MONTH = 1         # number of L size free shipments in a month
+FREE_SHIPMENT_ITERATIVE = 3         # number of L size packages to be sent until a member gets one free shipment
 
+'''
+class to save prices of diferent providers and package sizes
+e. g. provider = "LP", package_size = S, price = 5.50
+'''
 class Price:
     def __init__(self, provider, package_size, price):
         self.provider = provider
@@ -19,6 +23,15 @@ class Price:
     def __str__(self):
         return self.provider + " " + self.package_size + " " + str(self.price)
 
+'''
+class to save input data from .txt file
+valid - true if data is correct
+date - date of transaction
+size - size of a package (S, M, L)
+carrier - provider service (LP, MR)
+shipment_price - price to be paid by a member
+shipment_discount - discount, price to be paid by Vinted
+'''
 class Transaction:
     def __init__(self, valid, date, size, carrier):
         self.valid = valid
@@ -45,7 +58,7 @@ class Transaction:
         else:
             return "Invalid data"
 
-
+# method to get data from input files
 def get_input_data(prices_file, input_file):
     prices = []    
     with open(prices_file) as lines:
@@ -67,6 +80,7 @@ def get_input_data(prices_file, input_file):
 
     return prices, transactions
 
+# method to get lowest price for a targeted package size
 def get_lowest_price(prices, target):
     lowest = float('inf')
     for i in prices:
@@ -74,6 +88,7 @@ def get_lowest_price(prices, target):
             lowest = i.price
     return lowest
 
+# method to calculate discount and price to be paid by a memeber, if package size is S
 def apply_rule1(transaction, prices, lowest_price, applied_discount):
     for i in prices:
         if i.provider == transaction.carrier and i.package_size == transaction.size:
@@ -84,9 +99,10 @@ def apply_rule1(transaction, prices, lowest_price, applied_discount):
             transaction.shipment_discount = discount
             return transaction.shipment_price, transaction.shipment_discount, float(applied_discount + discount)
 
+# method to calculate discount and price to be paid by a memeber, if package is size of L
 def apply_rule2(transaction, price, free_shipments_counter, free_shipments_iterator, applied_discount):
     month = transaction.get_yyyy_mm()
-
+    
     if free_shipments_counter[month] > 0:
         if free_shipments_iterator[month] == 1:
             free_shipments_iterator[month] = 3
@@ -102,6 +118,7 @@ def apply_rule2(transaction, price, free_shipments_counter, free_shipments_itera
     else:
         return price, 0, free_shipments_counter, free_shipments_iterator, applied_discount
 
+# method to get key-value pairs that will be used count the amount of L size packages sent in a month
 def format_months_dict(transactions):    
     counter = dict()
     iterator = dict()
@@ -114,11 +131,13 @@ def format_months_dict(transactions):
             applied_discount[month] = float(0)
     return counter, iterator, applied_discount
 
+# method to get a price required to pay for the given transaction
 def get_provider_shipment_price(prices, provider, size):
     for i in prices:
         if i.provider == provider and i.package_size == size:
             return i.price
 
+# method to find how much a member has to pay and to find the discount for the shipment
 def calculate_transactions(prices, transactions):    
     free_shipments_counter, free_shipments_iterator, applied_discount = format_months_dict(transactions)
     lowest_price = get_lowest_price(prices, LOWEST_PRICE_SIZE)
@@ -134,13 +153,16 @@ def calculate_transactions(prices, transactions):
         if i.size == FREE_SHIPMENT_SIZE and i.carrier == FREE_SHIPMENT_PROVIDER:
             month = i.get_yyyy_mm()
             price = get_provider_shipment_price(prices, FREE_SHIPMENT_PROVIDER, FREE_SHIPMENT_SIZE)
-            i.shipment_price, i.shipment_discount, free_shipments_counter, free_shipments_iterator, applied_discount[month] = apply_rule2(i, price, free_shipments_counter, free_shipments_iterator, applied_discount[month])
+            i.shipment_price, i.shipment_discount, free_shipments_counter, free_shipments_iterator, applied_discount[month] = apply_rule2(
+                                                        i, price, free_shipments_counter, free_shipments_iterator, applied_discount[month]
+                                                        )
             calculated = True
         if not calculated:
             i.shipment_price = get_provider_shipment_price(prices, i.carrier, i.size)
 
     return transactions
 
+# the program starts here
 def main():
     prices, transactions = get_input_data(PRICES_FILE, INPUT_FILE)
     transactions = calculate_transactions(prices, transactions)

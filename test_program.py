@@ -3,11 +3,13 @@ import unittest
 from program import Transaction, Price
 from program import get_lowest_price
 from program import get_input_data
+from profile import apply_rule1
+from profile import apply_rule2
 
 price1 = Price("AAA", "X", 5.5)
 price2 = Price("BBB", "X", 10.9)
-price2 = Price("CCC", "Y", 4.8)
-prices = [price1, price2]
+price3 = Price("CCC", "Y", 4.8)
+prices = [price1, price2, price3]
 
 class TestLowestPrice(unittest.TestCase):
     # checking returning values from the methods

@@ -28,6 +28,11 @@ class TestExceptions(unittest.TestCase):
     def test_wrong_input_file(self):
         self.assertRaises(FileNotFoundError, get_input_data, "prices.txt", "wrongfile.txt")
 
+    def test_wrong_type(self):
+        with self.assertRaises(NotImplementedError):
+            t = Transaction(True, "", "", "")
+            price1==t
+
 transaction = Transaction(True, "2015-02-06", "S", "MR")
 transaction1 = Transaction(True, "2015-02-05", "L", "LP")
 transaction2 = Transaction(True, "2015-02-07", "L", "LP")
@@ -65,3 +70,10 @@ class TestRules(unittest.TestCase):
         shipment_price, discount, counter, iterator, applied_discount[transactions[5].get_yyyy_mm()] = apply_rule2(transactions[5], 4.40, counter, iterator, applied_discount[transactions[5].get_yyyy_mm()])
         self.assertEqual(shipment_price, 0)
         self.assertEqual(discount, 4.40)
+
+class TestOverrides(unittest.TestCase):
+    def test_eq(self):
+        self.assertEqual(transaction1==transaction2, False)
+
+    def test_lt(self):
+        self.assertEqual(price1 < price2, True)

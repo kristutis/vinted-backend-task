@@ -15,13 +15,62 @@ class to save prices of diferent providers and package sizes
 e. g. provider = "LP", package_size = S, price = 5.50
 '''
 class Price:
-    def __init__(self, provider, package_size, price):
-        self.provider = provider
-        self.package_size = package_size
-        self.price = price
+    def __init__(self, provider: str, package_size: str, price: float):
+        self.__provider: str = provider
+        self.__package_size: str = package_size
+        self.__price: float = price
+
+    @property
+    def provider(self):
+        return self.__provider
+
+    @property
+    def package_size(self):
+        return self.__package_size
+
+    @property
+    def price(self):
+        return self.__price
 
     def __str__(self):
-        return self.provider + " " + self.package_size + " " + str(self.price)
+        return "{}(provider={}, size={}, price={})".format(self.__class__.__name__, self.provider, self.package_size, self.price)
+
+    def __eq__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.provider, self.package_size, self.price) == (other.provider, other.package_size, other.price)
+        else: 
+            raise NotImplementedError
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.provider, self.package_size, self.price) < (other.provider, other.package_size, other.price)
+        else: 
+            raise NotImplementedError
+
+    def __le__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.provider, self.package_size, self.price) <= (other.provider, other.package_size, other.price)
+        else: 
+            raise NotImplementedError
+
+    def __gt__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.provider, self.package_size, self.price) > (other.provider, other.package_size, other.price)
+        else: 
+            raise NotImplementedError
+    
+    def __ge__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.provider, self.package_size, self.price) >= (other.provider, other.package_size, other.price)
+        else: 
+            raise NotImplementedError
+
+    def __hash__(self):
+        return hash((self.__class__, self.provider, self.package_size, self.price))
+
 
 '''
 class to save input data from .txt file
@@ -33,13 +82,81 @@ shipment_price - price to be paid by a member
 shipment_discount - discount, price to be paid by Vinted
 '''
 class Transaction:
-    def __init__(self, valid, date, size, carrier):
-        self.valid = valid
-        self.date = date
-        self.size = size
-        self.carrier = carrier
-        self.shipment_price = float(0)
-        self.shipment_discount = float(0)
+    def __init__(self, valid: str, date: str, size: str, carrier: str):
+        self.__valid: str = valid
+        self.__date: str = date
+        self.__size: str = size
+        self.__carrier: str = carrier
+        self.__shipment_price: float = float(0)
+        self.__shipment_discount: float = float(0)
+    
+    @property
+    def valid(self):
+        return self.__valid
+
+    @property
+    def date(self):
+        return self.__date
+
+    @property
+    def size(self):
+        return self.__size
+
+    @property
+    def carrier(self):
+        return self.__carrier
+
+    @property
+    def shipment_price(self):
+        return self.__shipment_price
+
+    @shipment_price.setter
+    def shipment_price(self, value: float):
+        self.__shipment_price: float = value
+
+    @property
+    def shipment_discount(self):
+        return self.__shipment_discount
+    
+    @shipment_discount.setter
+    def shipment_discount(self, value: float):
+        self.__shipment_discount: float = value
+    
+    def __eq__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.valid, self.date, self.size, self.carrier, self.shipment_price, self.shipment_discount) == (other.valid, other.date, other.size, other.carrier, other.shipment_price, other.shipment_discount)
+        else: 
+            raise NotImplementedError
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.valid, self.date, self.size, self.carrier, self.shipment_price, self.shipment_discount) < (other.valid, other.date, other.size, other.carrier, other.shipment_price, other.shipment_discount)
+        else: 
+            raise NotImplementedError
+
+    def __le__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.valid, self.date, self.size, self.carrier, self.shipment_price, self.shipment_discount) <= (other.valid, other.date, other.size, other.carrier, other.shipment_price, other.shipment_discount)
+        else: 
+            raise NotImplementedError
+
+    def __gt__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.valid, self.date, self.size, self.carrier, self.shipment_price, self.shipment_discount) > (other.valid, other.date, other.size, other.carrier, other.shipment_price, other.shipment_discount)
+        else: 
+            raise NotImplementedError
+    
+    def __ge__(self, other):
+        if other.__class__ is self.__class__:
+            return (self.valid, self.date, self.size, self.carrier, self.shipment_price, self.shipment_discount) >= (other.valid, other.date, other.size, other.carrier, other.shipment_price, other.shipment_discount)
+        else: 
+            raise NotImplementedError
+
+    def __hash__(self):
+        return hash((self.__class__, self.valid, self.date, self.size, self.carrier, self.shipment_price, self.shipment_discount))
 
     def __str__(self):
         if self.valid:
@@ -60,7 +177,7 @@ class Transaction:
 
 # method to get data from input files
 def get_input_data(prices_file, input_file):
-    prices = []    
+    prices = []
     with open(prices_file) as lines:
         for line in lines:
             fields = line.rstrip().split(" ")
@@ -105,7 +222,7 @@ def apply_rule2(transaction, price, free_shipments_counter, free_shipments_itera
 
     if free_shipments_counter[month] > 0:
         if free_shipments_iterator[month] == 1:
-            free_shipments_iterator[month] = 3
+            free_shipments_iterator[month] = FREE_SHIPMENT_ITERATIVE
             free_shipments_counter[month] -= 1
             if applied_discount + price > MAX_DISCOUNT:
                 discount = MAX_DISCOUNT - applied_discount

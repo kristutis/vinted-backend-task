@@ -1,4 +1,4 @@
-py.exe program.py
+python program.py
 echo "Press any key to continue"
 while [ true ] ; do
 read -t 3 -n 1
